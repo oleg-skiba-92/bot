@@ -1,12 +1,14 @@
-#Bot
+# Bot
 
 Telegram and viber bot
 
-##Requirements
+## Requirements
+
 - nodeJS v8 or above
 - created bots іn Telegram and Viber 
 
 ## Installation
+
 - clone project
 - run `npm install`
 - create .env file with that parameters:
@@ -20,14 +22,16 @@ Telegram and viber bot
  BASE_URL=https://yordomain.com
  ```
 
-##Start project
+## Start project
+
 `npm run start` 
 
 or
 
 `ts-node -r dotenv/config index.ts`
 
-##Helps and links
+## Helps and links
+
 For running in the local environment use [NgRok](https://developers.viber.com/blog/2017/05/24/test-your-bots-locally)
 
 [Firebase documentation](https://firebase.google.com/docs/admin/setup)
