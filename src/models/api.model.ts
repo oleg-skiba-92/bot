@@ -1,0 +1,20 @@
+export class ApiError extends Error {
+  constructor(msg) {
+    super(msg);
+    Object.setPrototypeOf(this, ApiError.prototype);
+  }
+}
+
+export class PhoneCancelError extends Error {
+  constructor(msg) {
+    super(msg);
+    Object.setPrototypeOf(this, PhoneCancelError.prototype);
+  }
+}
+
+export class PhoneViberError extends Error {
+  constructor(msg) {
+    super(msg);
+    Object.setPrototypeOf(this, PhoneViberError.prototype);
+  }
+}
