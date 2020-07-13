@@ -136,7 +136,7 @@ export class BotLogic {
       },
       {
         message: REGISTRATION_STEP_7_MESSAGE, objectKey: 'terms', inlineButtons: [
-          {label: URL_TERMS_LABEL, url: 'https://google.com'},
+          {label: URL_TERMS_LABEL, url: 'https://docs.google.com/document/d/16Q-xpALM5SGbL_FouZjEnyB4MiRsfppSETu3y58Vj6g/edit?usp=sharing'},
           {label: AGREE_LABEL, action: 'terms'}
         ]
       },
