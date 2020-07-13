@@ -6,12 +6,13 @@ import {
   EBotType,
   IBot,
   IBotButtons,
+  IGetPhoneLabels,
   IRegistrationStep,
   ITelegramContext,
 } from '../models/bot.model';
 import { TelegramRegistrationProcess } from './telegram-registration';
 import { TelegramContext } from './telegram-context';
-import { PhoneCancelError } from '../models/api.model';
+import { TelegramGetPhoneProcess } from './telegram-get-phone';
 
 export class TelegramBot extends EventEmitter implements IBot {
   public startButtons;
@@ -54,36 +55,16 @@ export class TelegramBot extends EventEmitter implements IBot {
     ctx.scene.enter('registration');
   }
 
-  // TODO rework it
-  public getPhone(ctx: TelegramContext): Promise<string> {
-    return new Promise((resolve, reject) => {
-      let _scene = new BaseScene('getPhone');
+  public getPhone(ctx: TelegramContext, labels: IGetPhoneLabels): Promise<string> {
+    const _scene = new TelegramGetPhoneProcess(this, labels);
+    this.stage.register(_scene.scene);
+    ctx.scene.enter('getPhone');
 
-      _scene.on('contact', (ctx) => {
-        resolve(ctx.message.contact.phone_number.slice(-10))
-      });
-      _scene.hears('Відмінити', (ctx) => {
-        return ctx.scene.leave().then(() => {
-          reject(new PhoneCancelError('SharePhoneCanceled'));
-        });
-      });
-
-      _scene.enter(() => {
-        ctx.message('Для продовження нам потрібен ваш номер телефону')
-        ctx.buttons(Markup.keyboard([
-          Markup.contactRequestButton('Відправити телефон'),
-          Markup.callbackButton('Відмінити', 'Відмінити')
-        ]).resize(true));
-        ctx.send()
-      });
-
-      this.stage.register(_scene);
-      ctx.scene.enter('getPhone');
-    });
+    return _scene.promise;
   }
 
   public registerWebHooks() {
-    return
+    return Promise.resolve(true);
   }
 
   private initCommands() {

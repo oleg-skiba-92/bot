@@ -13,7 +13,9 @@ export enum EBotType {
 export enum EBotEvents {
   RegistrationTimeOut = 'RegistrationTimeOut',
   RegistrationEnd = 'RegistrationEnd',
-  Start = "BotStart"
+  Start = "BotStart",
+  PhoneCancel = "PhoneCancel",
+  PhoneSent = "PhoneSent",
 }
 
 //#endregion enums
@@ -24,7 +26,15 @@ export interface ITelegramContext extends SceneContextMessageUpdate {
 export interface IRegistrationStep {
   message: string;
   objectKey: string;
+  validator?: string;
+  validatorMessage?: string;
   inlineButtons?: IBotButtons[]
+}
+
+export interface IGetPhoneLabels {
+  startMessage: string;
+  phoneButton: string;
+  cancelButton: string;
 }
 
 export interface IBotContext {
@@ -54,9 +64,9 @@ export interface IBot extends EventEmitter {
 
   startRegistration(ctx: IBotContext, steps: IRegistrationStep[]): void;
 
-  getPhone(ctx: IBotContext): Promise<string>;
+  getPhone(ctx: IBotContext, labels: IGetPhoneLabels): Promise<string>;
 
-  registerWebHooks(botWebHooks: string[], baseUrl: string, app: Application): void;
+  registerWebHooks(botWebHooks: string[], baseUrl: string, app: Application): Promise<boolean>;
 }
 
 //#endregion interfaces

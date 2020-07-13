@@ -1,14 +1,9 @@
-//#region types
-//#endregion types
 //#region interfaces
 
 export interface IUser {
-  id: string;
-  viberId?: string;
-  telegramId?: string;
-  phone?: string;
-  barcode?: string;
-  registrationData?: IRegistrationData
+  viberId: string;
+  telegramId: string;
+  phone: string;
 }
 
 export interface IRegistrationData {

@@ -4,7 +4,7 @@ import {
   EBotType,
   IBot,
   IBotButtons,
-  IBotContext,
+  IBotContext, IGetPhoneLabels,
   IRegistrationStep,
   TBotCallback
 } from '../models/bot.model';
@@ -75,9 +75,9 @@ export class ViberBot extends EventEmitter implements IBot {
     registration.startRegistration(ctx)
   }
 
-  public getPhone(ctx: IBotContext): Promise<string> {
+  public getPhone(ctx: IBotContext, labels: IGetPhoneLabels): Promise<string> {
     return new Promise((resolve, reject) => {
-      ctx.message('Для продовження нам потрібен ваш номер телефону');
+      ctx.message(labels.startMessage);
 
       ctx.buttons({
         Type: "keyboard",
@@ -87,14 +87,14 @@ export class ViberBot extends EventEmitter implements IBot {
             Rows: 1,
             ActionType: "share-phone",
             ActionBody: 'PHONE_ACTION',
-            Text: 'Відправити телефон'
+            Text: labels.phoneButton
           },
           {
             Columns: 6,
             Rows: 1,
             ActionType: "reply",
             ActionBody: 'CANCEL_PHONE',
-            Text: 'Відмінити'
+            Text: labels.cancelButton
           },
         ]
       });
@@ -112,7 +112,6 @@ export class ViberBot extends EventEmitter implements IBot {
           }
           if (message.text === 'CANCEL_PHONE') {
             this.bot.removeListener(Viber.Events.MESSAGE_RECEIVED, poneListener);
-            // resolve(null);
             reject(new PhoneCancelError('SharePhoneCanceled'));
           }
         }
@@ -122,22 +121,19 @@ export class ViberBot extends EventEmitter implements IBot {
     });
   }
 
-  public registerWebHooks(botWebHooks: string[], baseUrl: string, app: Application): void {
-    botWebHooks.forEach((webHook) => {
+  public registerWebHooks(botWebHooks: string[], baseUrl: string, app: Application): Promise<boolean> {
+    return Promise.all(botWebHooks.map((webHook) => {
       app.use(webHook, this.bot.middleware());
-      this.bot.setWebhook(baseUrl + webHook);
-    })
+      return this.bot.setWebhook(baseUrl + webHook);
+    }))
+      .then((res) => true, (err) => Promise.reject(err))
   }
 
   private initCommands() {
     this.bot.on(Viber.Events.CONVERSATION_STARTED, (response) => {
-      console.log('CONVERSATION_STARTED')
-      // this.bot.getUserDetails(response.userProfile)
-      //   .then(userDetails => console.log(userDetails), err => console.log('err', err));
       this.emit(EBotEvents.Start, new ViberContext(response));
     });
     this.bot.on(Viber.Events.SUBSCRIBED, (response) => {
-      console.log('SUBSCRIBED')
       this.emit(EBotEvents.Start, new ViberContext(response))
     });
   }

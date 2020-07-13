@@ -8,6 +8,7 @@ import {
   ITelegramContext
 } from '../models/bot.model';
 import { TelegramContext } from './telegram-context';
+import * as moment from 'moment';
 
 const REGISTRATION_TIME_OUT = 1000 * 30;
 
@@ -56,22 +57,43 @@ export class TelegramRegistrationProcess {
         return;
       }
 
+      if(!!this.currStep.validator){
+        const reg = new RegExp(this.currStep.validator);
+        if (!reg.test(ctx.message.text)) {
+          if(!!this.timeoutId) {
+            clearTimeout(this.timeoutId);
+          }
+          return ctx.reply(this.currStep.validatorMessage);
+        }
+      }
+
       this.registrationObj[this.currStep.objectKey] = ctx.message.text;
-      this.nextStep(new TelegramContext(ctx));
-
+      return this.nextStep(new TelegramContext(ctx));
     });
 
-    this.scene.action('genderFemale', (ctx) => {
-      this.registrationObj[this.currStep.objectKey] = 'female';
-      this.nextStep(new TelegramContext(ctx));
+    this.scene.action('genderFemale', async (ctx) => {
+      await ctx.answerCbQuery();
+      if(!this.registrationObj){
+        await ctx.scene.leave();
+      }
+      this.registrationObj[this.currStep.objectKey] = '2';
+      await this.nextStep(new TelegramContext(ctx));
     });
-    this.scene.action('genderMale', (ctx) => {
-      this.registrationObj[this.currStep.objectKey] = 'male';
-      this.nextStep(new TelegramContext(ctx));
+    this.scene.action('genderMale', async (ctx) => {
+      await ctx.answerCbQuery();
+      if(!this.registrationObj){
+        await ctx.scene.leave();
+      }
+      this.registrationObj[this.currStep.objectKey] = '1';
+      await this.nextStep(new TelegramContext(ctx));
     });
-    this.scene.action('terms', (ctx) => {
+    this.scene.action('terms', async (ctx) => {
+      await ctx.answerCbQuery();
+      if(!this.registrationObj){
+        await ctx.scene.leave();
+      }
       this.registrationObj[this.currStep.objectKey] = true;
-      this.nextStep(new TelegramContext(ctx));
+      await this.nextStep(new TelegramContext(ctx));
     });
   }
 
@@ -84,7 +106,7 @@ export class TelegramRegistrationProcess {
     if (this.currStep === null) {
       this.bot.emit(EBotEvents.RegistrationEnd, ctx, this.registrationObj);
       ctx.scene.leave();
-      return;
+      return Promise.resolve();
     }
 
     this.timeoutId = setTimeout(() => {
@@ -96,7 +118,7 @@ export class TelegramRegistrationProcess {
     if (this.currStep.inlineButtons) {
       ctx.buttons(Markup.inlineKeyboard(this.buttonsToMarkup(this.currStep.inlineButtons)))
     }
-    ctx.send();
+    return ctx.send();
   }
 
   private buttonsToMarkup(buttons: IBotButtons[] = []): any[] {

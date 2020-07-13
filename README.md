@@ -4,7 +4,9 @@ Telegram and viber bot
 
 ## Requirements
 
-- nodeJS v8 or above
+- NodeJS v8 or above
+- PostgreSQL v9.5
+- PM2 installed globally (optional)
 - created bots іn Telegram and Viber 
 
 ## Installation
@@ -13,25 +15,35 @@ Telegram and viber bot
 - run `npm install`
 - create .env file with that parameters:
 ```
- FB_CERT={"type": "service_account","project_id": "firebase-project-id","private_key_id": "firebase-key-id","private_key": "firebase-private-key","client_email": "firebase-adminsdk-email","client_id": "firebase-client-id","auth_uri": "https://accounts.google.com/o/oauth2/auth","token_uri": "https://oauth2.googleapis.com/token","auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url": "firebase-client_x509_cert_url"}
- FB_DB_URL=https://firebase-project-id.firebaseio.com
+ PORT=3000
+ LOG_LEVEL=INFO   // ('OFF' | 'INFO' | 'DEBUG')
+
+ DB_HOST=localhost
+ DB_PORT=5432
+ DB_NAME=DatabaseName
+ DB_USER=PostgresUser
+ DB_PASSWORD=PostgresUserPassword
  
  VIBER_TOKEN=viber-bot-token
  TELEGRAM_TOKEN=telegram-bot-token
+ API_TOKEN=api-token
  
  BASE_URL=https://yordomain.com
+ API_URL=https://yorAPI.com
  ```
 
 ## Start project
 
-`npm run start` 
+`npm run start:prod` 
 
 or
 
-`ts-node -r dotenv/config index.ts`
+`pm2 start ./process.json`
 
 ## Helps and links
 
 For running in the local environment use [NgRok](https://developers.viber.com/blog/2017/05/24/test-your-bots-locally)
 
-[Firebase documentation](https://firebase.google.com/docs/admin/setup)
+[PM2 documentation](https://pm2.keymetrics.io/docs/usage/process-management/)
+
+[PostgreSQL installation documentation](https://www.postgresql.org/docs/9.5/tutorial-install.html)

@@ -1,4 +1,4 @@
-import { EBotEvents, IBot, IBotContext } from './models/bot.model';
+import { EBotEvents, EBotType, IBot, IBotContext } from './models/bot.model';
 import { apiService } from './services/api.service';
 import {
   AGREE_LABEL,
@@ -8,7 +8,12 @@ import {
   FEMALE_LABEL,
   HELLO_MESSAGE,
   MALE_LABEL,
-  MY_CARD_LABEL, PHONE_CANCELED,
+  MY_CARD_LABEL,
+  PHONE_CANCELED,
+  PHONE_LABEL_CANCEL,
+  PHONE_LABEL_SEND,
+  PHONE_START_MESSAGE,
+  REGISTRATION_INVALID_DATE,
   REGISTRATION_LABEL,
   REGISTRATION_STEP_1_MESSAGE,
   REGISTRATION_STEP_2_MESSAGE,
@@ -16,15 +21,19 @@ import {
   REGISTRATION_STEP_4_MESSAGE,
   REGISTRATION_STEP_5_MESSAGE,
   REGISTRATION_STEP_6_MESSAGE,
-  REGISTRATION_STEP_7_MESSAGE, SUPPORT_LABEL,
+  REGISTRATION_STEP_7_MESSAGE,
+  SUPPORT_LABEL,
   TIMEOUT_MESSAGE,
-  URL_TERMS_LABEL, VIBER_PHONE_DESKTOP_ERROR
+  URL_TERMS_LABEL,
+  VIBER_PHONE_DESKTOP_ERROR
 } from './messages.const';
 import { IRegistrationData, IUser } from './models/user.model';
 import { ApiError, PhoneCancelError, PhoneViberError } from './models/api.model';
+import { ILogger, Logger } from './services/logger';
 
 export class BotLogic {
   private bot: IBot;
+  private log: ILogger = new Logger('Logic');
 
   constructor(bot: IBot) {
     this.bot = bot;
@@ -41,37 +50,40 @@ export class BotLogic {
     this.bot.on(EBotEvents.Start, (ctx) => this.onStart(ctx));
     this.bot.on(EBotEvents.RegistrationEnd, (ctx, data) => this.onRegistrationEnd(ctx, data));
     this.bot.on(EBotEvents.RegistrationTimeOut, (ctx) => this.onRegistrationTimeOut(ctx));
+    this.log.success(`Init logic for ${EBotType[this.bot.type]}`);
   }
 
   private getPhone(ctx: IBotContext): Promise<string> {
-    return this.getUserByBotId(ctx.userId)
+    return apiService.getUserByBotId(ctx.userId, this.bot.type)
       .then(user => {
-        if (!user.phone) {
-          return this.bot.getPhone(ctx)
-            .then((phone) => this.savePhone(phone, user))
+        if (!user) {
+          return this.bot.getPhone(ctx, {
+            phoneButton: PHONE_LABEL_SEND,
+            startMessage: PHONE_START_MESSAGE,
+            cancelButton: PHONE_LABEL_CANCEL,
+          })
+            .then((phone) => this.savePhone(phone, ctx.userId, this.bot.type))
         }
         return user.phone;
       })
   }
 
-  private getUserByBotId(userId: string): Promise<IUser> {
-    return apiService.getUserByBotId(userId, this.bot.type)
-      .then(res => {
-        if (res === null) {
-          return apiService.createUser(userId, this.bot.type)
-        }
-
-        return res;
-      })
-  }
-
-  private savePhone(phone: string, user: IUser): Promise<string> {
+  private savePhone(phone: string, userId: string, type: EBotType): Promise<string> {
+    const _user: IUser = {
+      phone,
+      telegramId: type === EBotType.Telegram ? userId : null,
+      viberId: type === EBotType.Viber ? userId : null
+    };
     return apiService.getUserByPhone(phone)
       .then((existUser) => {
         if (existUser === null) {
-          return apiService.saveUser({...user, phone});
+          return apiService.createUser(_user);
         } else {
-          return apiService.mergeUser(existUser, user)
+          return apiService.updateUser({
+            phone,
+            telegramId: existUser.telegramId || _user.telegramId,
+            viberId: existUser.viberId || _user.viberId,
+          })
         }
       })
       .then((user) => user.phone)
@@ -100,16 +112,8 @@ export class BotLogic {
   }
 
   private onStart(ctx: IBotContext) {
-    this.getUserByBotId(ctx.userId)
-      .then(res => {
-        if (res === null) {
-          return apiService.createUser(ctx.userId, this.bot.type)
-        }
-
-        return res;
-      })
-      .then(() => ctx.message(HELLO_MESSAGE).buttons(this.bot.startButtons).send())
-      .catch((err) => this.showError(ctx, err))
+    this.log.info(`Start conversation in ${EBotType[this.bot.type]}`);
+    ctx.message(HELLO_MESSAGE).buttons(this.bot.startButtons).send();
   }
 
   private startRegistration(ctx: IBotContext) {
@@ -117,7 +121,12 @@ export class BotLogic {
       {message: REGISTRATION_STEP_1_MESSAGE, objectKey: 'firstName'},
       {message: REGISTRATION_STEP_2_MESSAGE, objectKey: 'lastName'},
       {message: REGISTRATION_STEP_3_MESSAGE, objectKey: 'secondName'},
-      {message: REGISTRATION_STEP_4_MESSAGE, objectKey: 'birthDay'},
+      {
+        message: REGISTRATION_STEP_4_MESSAGE,
+        objectKey: 'birthDay',
+        validator: '\\d{1,2}\\.\\d{1,2}\\.\\d{2,4}',
+        validatorMessage: REGISTRATION_INVALID_DATE
+      },
       {message: REGISTRATION_STEP_5_MESSAGE, objectKey: 'address'},
       {
         message: REGISTRATION_STEP_6_MESSAGE, objectKey: 'gender', inlineButtons: [
@@ -135,6 +144,7 @@ export class BotLogic {
   }
 
   private onRegistrationClicked(ctx: IBotContext): void {
+    this.log.info(`Registration clicked in ${EBotType[this.bot.type]}`);
     this.getCard(ctx).then((res) => {
       if (res === null) {
         this.startRegistration(ctx);
@@ -147,6 +157,7 @@ export class BotLogic {
   }
 
   private onMyCardClicked(ctx: IBotContext): void {
+    this.log.info(`MyCard clicked in ${EBotType[this.bot.type]}`);
     this.getCard(ctx).then((res) => {
       if (res === null) {
         ctx.message(CARD_FAILED_MESSAGE).send()
@@ -160,16 +171,25 @@ export class BotLogic {
   }
 
   private onRegistrationTimeOut(ctx: IBotContext): void {
+    this.log.info(`Registration timeout in ${EBotType[this.bot.type]}`);
     ctx.message(TIMEOUT_MESSAGE).buttons(this.bot.startButtons).send();
   }
 
   private onRegistrationEnd(ctx: IBotContext, data: IRegistrationData): void {
-    apiService.saveRegistrationData(data, this.bot.type, ctx.userId)
-      .then((res) => {
-        ctx.sendPhoto(res, 'barcode.jpg').then(() => {
-          ctx.message(CARD_SUCCESS_MESSAGE).buttons(this.bot.startButtons).send();
-        });
-      })
+    this.log.info(`Registration end in ${EBotType[this.bot.type]}`);
+    apiService.getUserByBotId(ctx.userId, this.bot.type)
+      .then((user) => user.phone)
+      .then((phone) => apiService.saveRegistrationData(data, phone)
+        .then((res) => {
+          if (res === null) {
+            this.showError(ctx, new ApiError('HowItIsHappens?APIBug?'))
+          }
+
+          ctx.sendPhoto(res, 'barcode.jpg').then(() => {
+            ctx.message(CARD_SUCCESS_MESSAGE).buttons(this.bot.startButtons).send();
+          });
+        }))
+
       .catch((err) => this.showError(ctx, err));
   }
 }

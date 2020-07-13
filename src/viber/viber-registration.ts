@@ -79,10 +79,10 @@ export class ViberRegistrationProcess {
     let data = null;
     switch (message.text) {
       case 'genderFemale':
-        data = 'female';
+        data = '2';
         break;
       case 'genderMale':
-        data = 'male';
+        data = '1';
         break;
       case 'terms':
         data = true;
@@ -92,6 +92,20 @@ export class ViberRegistrationProcess {
           data = message.text;
         }
         break;
+    }
+
+    if(!!this.currStep.validator){
+      const reg = new RegExp(this.currStep.validator);
+      if (!reg.test(message.text)) {
+        if(!!this.timeoutId) {
+          clearTimeout(this.timeoutId);
+        }
+
+        const ctx = new ViberContext(response);
+        ctx.message(this.currStep.validatorMessage);
+        ctx.send();
+        return
+      }
     }
 
     if (data !== null) {

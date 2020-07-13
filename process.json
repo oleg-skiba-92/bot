@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "bot",
+      "script": "./index.ts",
+      "instances": 1,
+      "max_memory_restart": "1G",
+      "error_file": "./log/bot.errors.log",
+      "out_file": "./log/bot.out.log",
+      "node_args": "-r dotenv/config",
+      "exec_mode": "cluster",
+      "interpreter": "node_modules/.bin/ts-node"
+    }
+  ]
+}

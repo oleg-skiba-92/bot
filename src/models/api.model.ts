@@ -18,3 +18,16 @@ export class PhoneViberError extends Error {
     Object.setPrototypeOf(this, PhoneViberError.prototype);
   }
 }
+
+export enum EApiResultCode {
+  TokenError = -1,
+  Success = 0,
+  CardNotExist = 1,
+  CardExist = 2,
+}
+
+export interface IApiResponse<T> {
+  Message: string,
+  Result: EApiResultCode,
+  Data: T
+}
