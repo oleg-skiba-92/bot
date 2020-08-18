@@ -81,8 +81,8 @@ export class BotLogic {
         } else {
           return apiService.updateUser({
             phone,
-            telegramId: existUser.telegramId || _user.telegramId,
-            viberId: existUser.viberId || _user.viberId,
+            telegramId: type === EBotType.Telegram ? _user.telegramId : existUser.telegramId,
+            viberId: type === EBotType.Viber ? _user.viberId : existUser.viberId
           })
         }
       })
