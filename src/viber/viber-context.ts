@@ -22,7 +22,7 @@ export class ViberContext implements IBotContext {
   }
 
   public sendPhoto(url, filename: string): Promise<any> {
-    return this.ctx.send(new Viber.Message.Picture(url));
+    return this.ctx.send(new Viber.Message.Picture(`${process.env.BASE_URL}/${url}`));
   }
 
   public message(msg: string): ViberContext {

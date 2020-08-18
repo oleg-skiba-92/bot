@@ -30,7 +30,7 @@ export class TelegramContext implements IBotContext {
   }
 
   public sendPhoto(url, fileName: string): Promise<any> {
-    return this.ctx.replyWithPhoto({url, filename: fileName});
+    return this.ctx.replyWithPhoto({source: url});
   }
 
   public message(msg: string): TelegramContext {

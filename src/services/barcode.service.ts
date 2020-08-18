@@ -43,7 +43,7 @@ class BarcodeService implements IBarcodeService {
       this.log.info(`created img ${code}.jpg`);
     }
 
-    return `${process.env.BASE_URL}/assets/barcodes/${code}.jpg`
+    return `assets/barcodes/${code}.jpg`
   }
 }
 
