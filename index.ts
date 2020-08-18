@@ -7,6 +7,7 @@ import { TelegramBot } from './src/telegram/telegram-bot';
 import { ViberBot } from './src/viber/viber-bot';
 import { dataService } from './src/services/data.service';
 import { ILogger, Logger } from './src/services/logger';
+import { join } from "path";
 
 // this.tBot.bot.telegram.sendMessage(481844551, 'test');
 
@@ -43,7 +44,7 @@ class App {
       return;
     }
 
-    this.app.use('/assets', express.static('./assets'));
+    this.app.use('/assets', express.static(join(process.cwd(), 'browser')));
 
     this.app.listen(this.PORT, () => {
       this.log.success(`Server listening on http://localhost:${this.PORT}`);
