@@ -44,7 +44,7 @@ class App {
       return;
     }
 
-    this.app.use('/assets', express.static(join(process.cwd(), 'browser')));
+    this.app.use('/assets', express.static(join(process.cwd(), 'assets')));
 
     this.app.listen(this.PORT, () => {
       this.log.success(`Server listening on http://localhost:${this.PORT}`);
