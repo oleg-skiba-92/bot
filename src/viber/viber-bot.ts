@@ -24,8 +24,8 @@ export class ViberBot extends EventEmitter implements IBot {
     super();
     this.bot = new Viber.Bot({
       authToken: process.env.VIBER_TOKEN,
-      name: "FOP412",
-      avatar: "https://firebasestorage.googleapis.com/v0/b/forbot-8b259.appspot.com/o/Angular_full_color_logo.svg.png?alt=media&token=b5633691-2c5c-47e0-ba3e-56fec9fa3bef"
+      name: "Аврора",
+      avatar: `${process.env.BASE_URL}/assets/avatar.jpg`
     });
     this.botWebHooks = ['/viber/webhook'];
     this.startButtons = null;
