@@ -6,15 +6,13 @@ import {
   CARD_FAILED_MESSAGE,
   CARD_SUCCESS_MESSAGE,
   FEMALE_LABEL,
-  HELLO_MESSAGE,
+  HELLO_MESSAGE, LABELS,
   MALE_LABEL,
-  MY_CARD_LABEL,
   PHONE_CANCELED,
   PHONE_LABEL_CANCEL,
   PHONE_LABEL_SEND,
   PHONE_START_MESSAGE,
   REGISTRATION_INVALID_DATE,
-  REGISTRATION_LABEL,
   REGISTRATION_STEP_1_MESSAGE,
   REGISTRATION_STEP_2_MESSAGE,
   REGISTRATION_STEP_3_MESSAGE,
@@ -22,7 +20,6 @@ import {
   REGISTRATION_STEP_5_MESSAGE,
   REGISTRATION_STEP_6_MESSAGE,
   REGISTRATION_STEP_7_MESSAGE,
-  SUPPORT_LABEL,
   TIMEOUT_MESSAGE,
   URL_TERMS_LABEL,
   VIBER_PHONE_DESKTOP_ERROR
@@ -42,9 +39,14 @@ export class BotLogic {
 
   private init() {
     this.bot.setStartButtons([
-      {label: REGISTRATION_LABEL, cb: (ctx) => this.onRegistrationClicked(ctx)},
-      {label: MY_CARD_LABEL, cb: (ctx) => this.onMyCardClicked(ctx)},
-      {label: SUPPORT_LABEL, url: 'https://chats.viber.com/avrora.ua/%2B/ru'}
+      {label: LABELS.BUTTON.REGISTRATION, cb: (ctx) => this.onRegistrationClicked(ctx)},
+      {label: LABELS.BUTTON.MY_CARD, cb: (ctx) => this.onMyCardClicked(ctx)},
+      {label: LABELS.BUTTON.SUPPORT, url: 'https://avrora.ua'},
+      {label: LABELS.BUTTON.MOBILE_APP, url: 'https://play.google.com/store/apps/details?id=ua.avrora.app&hl=uk'},
+      {label: LABELS.BUTTON.SITE, url: 'https://avrora.ua/'},
+      {label: LABELS.BUTTON.PROMO, url: 'https://www.instagram.com/avrorasogodni'},
+      {label: LABELS.BUTTON.FB, url: 'https://www.facebook.com/avrorasogodni/'},
+      {label: LABELS.BUTTON.INSTAGRAM, url: 'https://www.instagram.com/avrorasogodni/'},
     ]);
 
     this.bot.on(EBotEvents.Start, (ctx) => this.onStart(ctx));

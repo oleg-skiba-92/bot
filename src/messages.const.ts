@@ -15,11 +15,20 @@ export const FEMALE_LABEL = 'Жінка';
 export const MALE_LABEL = 'Чоловік';
 export const URL_TERMS_LABEL = 'Посилання на правила';
 export const AGREE_LABEL = 'Погоджуюсь';
-export const MY_CARD_LABEL = 'Моя карта';
-export const SUPPORT_LABEL = 'Підтримка';
-export const REGISTRATION_LABEL = 'Реєстрація';
 export const PHONE_CANCELED = 'Ми не можемо продовжити без вашого номеру телефона';
 export const VIBER_PHONE_DESKTOP_ERROR = 'Вибачте, ми не можемо отримати ваш номер телефону через комп\'ютерну версію додатку, скористайтеся будь ласка додатком на вашому телефоні.';
 export const PHONE_LABEL_CANCEL = 'Відмінити';
 export const PHONE_LABEL_SEND = 'Відправити телефон';
 export const PHONE_START_MESSAGE = 'Для продовження нам потрібен ваш номер телефону';
+export const LABELS = {
+  BUTTON : {
+    REGISTRATION: 'Реєстрація',
+    MY_CARD: 'Моя карта',
+    SUPPORT: 'Підтримка',
+    MOBILE_APP: 'Мобільний додаток «Аврора»',
+    SITE: 'Сайт',
+    PROMO: 'Акції',
+    FB: 'Facebook',
+    INSTAGRAM: 'Instagram',
+  }
+};

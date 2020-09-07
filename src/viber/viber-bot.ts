@@ -56,7 +56,7 @@ export class ViberBot extends EventEmitter implements IBot {
 
     buttons.forEach((button, index) => {
       this.startButtons.Buttons.push({
-        Columns: 6 / ((index === 2) ? 1 : 2),
+        Columns: 6 / 2,
         Rows: 1,
         ActionType: !!button.url ? 'open-url' : 'reply',
         ActionBody: !!button.url ? button.url : button.label + 'ACTION',
