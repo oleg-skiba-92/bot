@@ -18,7 +18,7 @@
     "express": "4.17.1",
     "fs": "0.0.1-security",
     "jsbarcode": "3.11.0",
-    "moment": "2.24.0",
+    "moment": "2.29.2",
     "pg": "8.2.1",
     "pm2": "4.4.0",
     "telegraf": "3.36.0",
